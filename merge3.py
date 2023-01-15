@@ -41,7 +41,7 @@ def create_gem_grid(new_gem_grid):
                 row_of_gems.append(0)
             else:
                 gem_color = col
-                row_of_gems.append(Gem(gem_color,index,col_index,new_gem_grid))
+                row_of_gems.append(Gem(gem_color,index,col_index))
                 #row_of_gems[col_index].place_gem()
         list_of_gems.append(row_of_gems)
     return list_of_gems
