@@ -1,5 +1,7 @@
 import pygame
 import time
+import csv
+
 
 WIDTH, HEIGHT = 900, 500
 WIN = pygame.display.set_mode((WIDTH,HEIGHT))
@@ -13,8 +15,7 @@ YELLOW = (255,255,0)
 FPS = 60
 GEM_SIZE = 50
 colors = {'r':RED,'g': GREEN, 'b': BLUE, 'k': BLACK}
-#Initial gem_grid
-#gem_grid = [['r','b','g'],['g','r','b'],['b','r','g']]
+
 gem_grid = [['r','b','g','r','b','g'],
             ['b','g','r','b','g','r'],
             ['g','r','b','g','r','b'],
@@ -24,81 +25,12 @@ gem_grid = [['r','b','g','r','b','g'],
             ]
 
 new_gem_grid = gem_grid
-select = False    
-
-class Gem():
-    global new_gem_grid, colors
-    clicked_gems = []
-    def __init__(self, color, grid_row, grid_column): #Color should be passed as a single letter since it makes the 
-                                                      #grid easier to see what lines up
-        self.color = color
-        if self.color == 'k':
-            self.is_moveable = False
-            self.is_selectable = False
-        else:
-            self.is_moveable = True
-            self.is_selectable = True
-        self.gem_x, self.gem_y = self.set_new_position(grid_row,grid_column)
-        self.clicked = False
-        self.selected = False
-    
-
-    def set_new_position(self, grid_row, grid_column):
-        #Top of base rect is at 450 px
-        #Place each gem at 450 - (GEM_SIZE * (row_offset - self.row_pos)) for y pos
-        #Place gem at 400 + GEM_SIZE* self.col_pos -> Change this to center after working
-        self.row_pos = grid_row
-        self.col_pos = grid_column
-        row_offset = len(new_gem_grid)
-        column_offset = len(new_gem_grid[0])
-        self.new_position_x = 450 + GEM_SIZE * self.col_pos - (column_offset/2 * GEM_SIZE)
-        self.new_position_y = 450 - (GEM_SIZE *(row_offset - self.row_pos))
-
-        return self.new_position_x, self.new_position_y
-
-    def place_gem(self):
-        self.move_gem()
-        pygame.draw.rect(WIN,colors[self.color],pygame.Rect(self.gem_x, self.gem_y,GEM_SIZE,GEM_SIZE))
-        if self.selected == True:
-            pygame.draw.rect(WIN,YELLOW,pygame.Rect(self.gem_x, self.gem_y,GEM_SIZE,GEM_SIZE),5)
-
-    def get_gem_rect(self):
-        return (self.gem_x,self.gem_y, GEM_SIZE,GEM_SIZE)
-
-    def get_gem_grid_pos(self):
-        return (self.row_pos,self.col_pos)
-
-    def move_gem(self):
-        #move the gem to the new position
-        move_x = 10
-        move_y = 10
-        #self.new_position_x = 100
-        #self.new_position_y = 0
-        #Edit this some more to make it smoother
-        if self.new_position_x > self.gem_x +10: 
-            self.gem_x += move_x
-        elif self.new_position_x < self.gem_x - 10:
-            self.gem_x -= move_x
-        elif self.new_position_y > self.gem_y + 10:
-            self.gem_y += move_y
-        elif self.new_position_y < self.gem_y - 10:
-            self.gem_y -= move_y
-        else:
-            self.gem_x = self.new_position_x
-            self.gem_y = self.new_position_y
-
-    def select(self):
-        if self.is_selectable:
-            #print(f"Gem at pos {self.row_pos},{self.col_pos} selected")
-            self.clicked_gems.append((self.row_pos,self.col_pos))
-            self.selected = True
-            #print(f"Here is the list of gems that have been clicked: {self.clicked_gems}")
-            self.clicked = True
-
-    def deselect(self):
-        self.selected = False
-        self.clicked = False
-        self.place_gem()
+select = False 
+#Make sure to do something about this -> very bad style
+with open('new_gem_grid.csv','w+',newline='') as gem_writer:
+        mywriter = csv.writer(gem_writer, delimiter=',')
+        mywriter.writerows(gem_grid)
+from Gem import Gem
 
 def create_gem_grid(new_gem_grid):
     list_of_gems = []
@@ -109,7 +41,7 @@ def create_gem_grid(new_gem_grid):
                 row_of_gems.append(0)
             else:
                 gem_color = col
-                row_of_gems.append(Gem(gem_color,index,col_index))
+                row_of_gems.append(Gem(gem_color,index,col_index,new_gem_grid))
                 #row_of_gems[col_index].place_gem()
         list_of_gems.append(row_of_gems)
     return list_of_gems
@@ -258,10 +190,12 @@ def select_gem(mouse, mouse_clicked):
                 select = False
                 col.select()
 #print(Gem().clicked_gems)
+
 def main():
     clock = pygame.time.Clock()
     run = True
     mouse_clicked = False
+    
     while run:
         clock.tick(FPS)
         for event in pygame.event.get():
