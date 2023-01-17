@@ -21,26 +21,19 @@ GEM_SIZE = 50
 colors = {'r':RED,'g': GREEN, 'b': BLUE, 'k': BLACK}
 current_level = 1
 level_selected = True
-
-'''
-gem_grid = [['r','b','g','r','b','g'],
-            ['b','g','r','b','g','r'],
-            ['g','r','b','g','r','b'],
-            ['r','b','g','r','b','g'],
-            ['b','g','r','b','g','r'],
-            ['g','r','b','g','r','b'],
-            ]
-'''
-#new_gem_grid = gem_grid
-#new_gem_grid = level.get_gem_grid(current_level)
+status = "Menu"
 
 def draw_window(mouse,mouse_clicked):
-    global list_of_gems
+    global list_of_gems, status
     WIN.fill(TAN)
     base_rect = pygame.draw.rect(WIN, BLACK, pygame.Rect(50,450, 800, 25))
-    #center_rect = pygame.draw.rect(WIN, BLACK, pygame.Rect(450, 0, 1, 500))
-    #draw_gem_grid(list_of_gems)
-    Board.play_level(mouse, mouse_clicked)
+    #Add options for picking a level, win screen after each level, final win screen
+    if status == "Menu":
+        menu.draw_start_menu()
+        status = menu.check_start_clicked(mouse, mouse_clicked)
+        print(status)
+    elif status == "Play":
+            Board.play_level(mouse, mouse_clicked)
     pygame.display.update()
 def main():
     clock = pygame.time.Clock()
@@ -48,7 +41,7 @@ def main():
     mouse_clicked = False
     level_selected = True
     current_level = 1
-    status = "menu"
+    status = "Play"
     while run:
         clock.tick(FPS)
         for event in pygame.event.get():
@@ -59,11 +52,11 @@ def main():
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 mouse_clicked = False
         mouse = pygame.mouse.get_pos()
-        
         if level_selected and current_level <= level.get_max_level():
             new_gem_grid = level.get_gem_grid(current_level)
             Board.set_new_gem_grid(new_gem_grid)
             level_selected = False
+        
         level_won = Board.check_win()
         if level_won:
             level_selected = True
