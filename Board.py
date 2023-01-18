@@ -178,7 +178,11 @@ def play_level(mouse, mouse_clicked):
     check_three_in_a_row()
     drop_gems()
     level_won = check_win()
-    if level_won:
+    '''if level_won:
         print("Congratulations, you won")
+        status = "Select Level"
+    else:
+        status = "Play"
+    return status'''
 
     draw_gem_grid(list_of_gems)

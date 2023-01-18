@@ -1,3 +1,4 @@
+import pygame
 class Level():
     def __init__(self, level, gem_grid, three_star, two_star, one_star):
         self.gem_grid = gem_grid
@@ -10,6 +11,7 @@ def get_gem_grid(current_level):
 
 def get_max_level():
     return len(levels)
+
 levels = []
 gem_grid = [[0,0,0],['r','r','g'],['g','g','r']]
 level1 = Level(1,gem_grid, 1,2,3)
@@ -23,4 +25,5 @@ gem_grid = [['r','b','r'],['b','g','b'],['g','r','g']]
 level3 = Level(3,gem_grid, 2,3,4)
 #levels.append[level3]
 
-levels = [level1, level2, level3]
+levels = [level1, level2, level3] * 5
+
