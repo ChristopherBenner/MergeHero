@@ -6,11 +6,17 @@ class Level():
         self.three_star = three_star
         self.two_star = two_star
         self.one_star = one_star
+        self.stars_earned = 0
+
+    def get_star_moves(self):
+        return [self.three_star, self.two_star, self.one_star]
+        
 def get_gem_grid(current_level):
     return levels[current_level - 1].gem_grid
 
 def get_max_level():
     return len(levels)
+
 
 levels = []
 gem_grid = [[0,0,0],['r','r','g'],['g','g','r']]

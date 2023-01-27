@@ -22,9 +22,12 @@ colors = {'r':RED,'g': GREEN, 'b': BLUE, 'k': BLACK}
 current_level = 1
 level_selected = True
 status = "Menu"
+max_level_unlocked = 1
+max_level = level.get_max_level()
+level_score = 0
 
 def draw_window(mouse,mouse_clicked):
-    global list_of_gems, status, current_level, level_selected
+    global status, current_level, level_selected, max_level_unlocked, level_score
     WIN.fill(TAN)
     base_rect = pygame.draw.rect(WIN, BLACK, pygame.Rect(50,450, 800, 25))
     #Add options for picking a level, win screen after each level, final win screen
@@ -36,22 +39,39 @@ def draw_window(mouse,mouse_clicked):
             time.sleep(0.5)
     elif status == "Select Level":
         #time.sleep(1)
-        status, current_level = menu.draw_select_level(mouse, mouse_clicked)
+        status, current_level = menu.draw_select_level(mouse, mouse_clicked, max_level_unlocked)
         if status == "Play":
             level_selected = True
+    elif status == "Next Level":
+        status, current_level = menu.next_level(mouse, mouse_clicked, current_level, status)
+        if status == "Play":
+            level_selected = True
+    elif status == "Game Over":
+        status = menu.game_over(mouse, mouse_clicked)
     elif status == "Play":
         if level_selected and current_level <= level.get_max_level():
             new_gem_grid = level.get_gem_grid(current_level)
             Board.set_new_gem_grid(new_gem_grid)
             level_selected = False
-        Board.play_level(mouse, mouse_clicked)
+        
         level_won = Board.check_win()
-        if level_won:
+        if level_won and current_level <= max_level:
             print("Congratulations, you won")
-            status = "Select Level"
+            print(f"You took {level_score} moves")
+            Board.get_stars(current_level, level_score)
+            status = "Next Level"
+            #if current_level == max_level:
+            #    status = "Game Over"
+            if current_level == max_level_unlocked and current_level < max_level:
+                max_level_unlocked += 1
+                print(f"Max level increased to {max_level_unlocked}")
+            #status = "Select Level"
             time.sleep(0.1)
+        elif level_won and current_level >= max_level:
+            status = "Game Over"
         else:
-            status = "Play"
+            #status = "Play"
+            status, level_score = Board.play_level(mouse, mouse_clicked, status)
         #print(status)
     pygame.display.update()
 def main():
@@ -60,6 +80,7 @@ def main():
     mouse_clicked = False
     level_selected = True
     current_level = 1
+    max_level_unlocked = 1
     while run:
         clock.tick(FPS)
         for event in pygame.event.get():
@@ -70,14 +91,6 @@ def main():
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 mouse_clicked = False
         mouse = pygame.mouse.get_pos()
-        #move this section to if status == Select Level
-        
-        
-        
-        #level_won = Board.check_win()
-        #if level_won:
-        #status = "Select Level"
-        
 
         draw_window(mouse, mouse_clicked)
         
