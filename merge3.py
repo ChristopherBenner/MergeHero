@@ -48,6 +48,10 @@ def draw_window(mouse,mouse_clicked):
             level_selected = True
     elif status == "Game Over":
         status = menu.game_over(mouse, mouse_clicked)
+    elif status == "Restart":
+        level_selected = True
+        status = "Play"
+        time.sleep(0.1)
     elif status == "Play":
         if level_selected and current_level <= level.get_max_level():
             new_gem_grid = level.get_gem_grid(current_level)
@@ -60,27 +64,21 @@ def draw_window(mouse,mouse_clicked):
             print(f"You took {level_score} moves")
             Board.get_stars(current_level, level_score)
             status = "Next Level"
-            #if current_level == max_level:
-            #    status = "Game Over"
             if current_level == max_level_unlocked and current_level < max_level:
                 max_level_unlocked += 1
                 print(f"Max level increased to {max_level_unlocked}")
-            #status = "Select Level"
             time.sleep(0.1)
         elif level_won and current_level >= max_level:
             status = "Game Over"
         else:
             #status = "Play"
             status, level_score = Board.play_level(mouse, mouse_clicked, status)
-        #print(status)
     pygame.display.update()
 def main():
     clock = pygame.time.Clock()
     run = True
     mouse_clicked = False
     level_selected = True
-    current_level = 1
-    max_level_unlocked = 1
     while run:
         clock.tick(FPS)
         for event in pygame.event.get():
