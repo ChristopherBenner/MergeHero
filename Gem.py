@@ -1,5 +1,4 @@
 import pygame
-import new_gem_grid
 #Help! I don't want to have to call all of these variables
 WIDTH, HEIGHT = 900, 500
 WIN = pygame.display.set_mode((WIDTH,HEIGHT))
@@ -12,26 +11,19 @@ BLACK = (0,0,0)
 YELLOW = (255,255,0)
 FPS = 60
 GEM_SIZE = 50
+RED = pygame.image.load("images/ruby.png")
+GREEN = pygame.image.load("images/emerald.png")
+BLUE = pygame.image.load("images/sapphire.png")
+BLACK = pygame.image.load("images/stone.png")
 colors = {'r':RED,'g': GREEN, 'b': BLUE, 'k': BLACK}
-'''with open('new_gem_grid.csv','r') as gem_reader:
-    reader = csv.reader(gem_reader)
-    new_gem_grid = list(reader)'''
-#Initial gem_grid
-'''gem_grid = [['r','b','g','r','b','g'],
-            ['b','g','r','b','g','r'],
-            ['g','r','b','g','r','b'],
-            ['r','b','g','r','b','g'],
-            ['b','g','r','b','g','r'],
-            ['g','r','b','g','r','b'],
-            ]
-'''
+
 new_gem_grid = [[0,0,0],[0,0,0],[0,0,0]]
 #new_gem_grid = []
 #new_gem_grid = new_gem_grid.get_new_gem_grid()
 class Gem():
     #global new_gem_grid, colors
     global colors
-    new_gem_grid = [[0,0,0],[0,0,0],[0,0,0]]
+    #new_gem_grid = [[0,0,0],[0,0,0],[0,0,0]]
     new_gem_grid = []
     clicked_gems = []
     def __init__(self, color, grid_row, grid_column): #Color should be passed as a single letter since it makes the 
@@ -55,8 +47,9 @@ class Gem():
         self.row_pos = grid_row
         self.col_pos = grid_column
         try:
-            row_offset = len(new_gem_grid)
-            column_offset = len(new_gem_grid[0])
+            row_offset = len(self.new_gem_grid)
+            column_offset = len(self.new_gem_grid[0])
+            print(row_offset)
         except:
             row_offset = 0
             column_offset = 0
@@ -67,7 +60,8 @@ class Gem():
 
     def place_gem(self):
         self.move_gem()
-        pygame.draw.rect(WIN,colors[self.color],pygame.Rect(self.gem_x, self.gem_y,GEM_SIZE,GEM_SIZE))
+        WIN.blit(colors[self.color],(self.gem_x, self.gem_y))
+        #pygame.draw.rect(WIN,colors[self.color],pygame.Rect(self.gem_x, self.gem_y,GEM_SIZE,GEM_SIZE))
         if self.selected == True:
             pygame.draw.rect(WIN,(255,255,0),pygame.Rect(self.gem_x, self.gem_y,GEM_SIZE,GEM_SIZE),5)
 

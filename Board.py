@@ -1,13 +1,17 @@
-import new_gem_grid
 import pygame
 from Gem import Gem
-
+import menu
+import level as level
+import time
+score = 0
 new_gem_grid = [[0,0,0],[0,0,0],[0,0,0]]
 select = False
+
 def set_new_gem_grid(gem_grid):
-    global new_gem_grid, list_of_gems
+    global new_gem_grid, list_of_gems, score
     Gem.new_gem_grid = gem_grid
     new_gem_grid = gem_grid
+    score = 0
     list_of_gems = create_gem_grid(new_gem_grid)
     draw_gem_grid(list_of_gems)
 
@@ -72,6 +76,7 @@ def switch_gems(gem1_pos, gem2_pos):
     list_of_gems[gem2_row][gem2_col].set_new_position(gem2_row,gem2_col)
 
 def click_action():
+    global score
     if len(Gem.clicked_gems) == 2:
         gem1_pos = Gem.clicked_gems[0]
         gem2_pos = Gem.clicked_gems[1]
@@ -89,8 +94,10 @@ def click_action():
             #move gems
             Gem.clicked_gems = []
             switch_gems(gem1_pos, gem2_pos)
+            score += 1
             list_of_gems[gem1_row][gem1_col].deselect()
             list_of_gems[gem2_row][gem2_col].deselect()
+    return score
 
 def drop_gems():
     global list_of_gems
@@ -172,17 +179,33 @@ def check_win():
             if list_of_gems[row][col].is_moveable:
                 return False
     return True
-def play_level(mouse, mouse_clicked):
+
+def get_stars(current_level, level_score):
+    stars = level.levels[current_level-1].get_star_moves()
+    if level_score <= stars[0]:
+        print("You won three stars")
+        stars_earned = 3
+    elif level_score <= stars[1]:
+        print("You won two stars")
+        stars_earned = 2
+    elif level_score <= stars[2]:
+        print("You won one star")
+        stars_earned = 1
+    else:
+        print("You won zero stars")
+        stars_earned = 0
+    level.levels[current_level-1].stars_earned = stars_earned
+
+def play_level(mouse, mouse_clicked, status):
+    global level_score
+    if status == "Play":
+        status = menu.restart(mouse, mouse_clicked, status)
     select_gem(mouse, mouse_clicked)
-    click_action()
+    level_score = click_action()
     check_three_in_a_row()
     drop_gems()
     level_won = check_win()
-    '''if level_won:
-        print("Congratulations, you won")
-        status = "Select Level"
-    else:
-        status = "Play"
-    return status'''
-
+    status = menu.draw_menu_button(mouse, mouse_clicked, status)
     draw_gem_grid(list_of_gems)
+
+    return status, level_score
