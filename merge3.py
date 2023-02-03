@@ -6,6 +6,7 @@ import Board
 import level as level
 import settings
 import menu
+import math
 
 WIDTH, HEIGHT = settings.WIDTH, settings.HEIGHT
 WIN = pygame.display.set_mode((WIDTH,HEIGHT))
@@ -25,9 +26,46 @@ status = "Menu"
 max_level_unlocked = 1
 max_level = level.get_max_level()
 level_score = 0
+hero_position = [50,370] #x,y
+hero_step_position = 1
+#load the walk animation for the hero
+hero_steps = []
+hero_step_count = 1
+walk = False
+reached_destination = False
+
+background_music = pygame.mixer.music.load("sounds/background_music.mp3")
+#switch_sound = pygame.mixer.Sound("sounds/switch.mp3")
+pygame.mixer.music.play(-1)
+
+for i in range(4):
+    image = pygame.image.load("images/hero_right_" + str(i + 1) + ".png")
+    hero_steps.append(image)
+
+def set_hero_image():
+    global status, walk, hero_step_count, hero_position, hero_step_position, reached_destination
+    if walk:
+        step_delay = 5
+        hero_step_count += 1
+
+        if hero_step_count >= 4 * step_delay:
+            hero_step_count = 1
+        hero_step_position = math.floor(hero_step_count / step_delay) +1
+        hero_position[0] += 5
+    if hero_position[0] >= 700:
+        #status = "Next Level"
+        walk = False
+        hero_position[0] = 50
+        reached_destination = True
+        time.sleep(0.8)
+    else:
+        reached_destination = False
+    WIN.blit(hero_steps[hero_step_position -1], (hero_position[0],hero_position[1]))
+    #return status
+
 
 def draw_window(mouse,mouse_clicked):
-    global status, current_level, level_selected, max_level_unlocked, level_score
+    global status, current_level, level_selected, max_level_unlocked, level_score, walk
     WIN.fill(TAN)
     base_rect = pygame.draw.rect(WIN, BLACK, pygame.Rect(50,450, 800, 25))
     #Add options for picking a level, win screen after each level, final win screen
@@ -59,11 +97,15 @@ def draw_window(mouse,mouse_clicked):
             level_selected = False
         
         level_won = Board.check_win()
-        if level_won and current_level <= max_level:
+        if level_won and not reached_destination:
+            #status = "Play"
+            walk = True
+        if level_won and current_level <= max_level and not walk:
             print("Congratulations, you won")
             print(f"You took {level_score} moves")
             Board.get_stars(current_level, level_score)
             status = "Next Level"
+            #status = "Walk"
             if current_level == max_level_unlocked and current_level < max_level:
                 max_level_unlocked += 1
                 print(f"Max level increased to {max_level_unlocked}")
@@ -73,6 +115,8 @@ def draw_window(mouse,mouse_clicked):
         else:
             #status = "Play"
             status, level_score = Board.play_level(mouse, mouse_clicked, status)
+            set_hero_image()
+    
     pygame.display.update()
 def main():
     clock = pygame.time.Clock()

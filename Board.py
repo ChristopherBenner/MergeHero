@@ -6,6 +6,7 @@ import time
 score = 0
 new_gem_grid = [[0,0,0],[0,0,0],[0,0,0]]
 select = False
+switch_sound = pygame.mixer.Sound("sounds/switch.mp3")
 
 def set_new_gem_grid(gem_grid):
     global new_gem_grid, list_of_gems, score
@@ -65,6 +66,7 @@ def draw_gem_grid(list_of_gems):
 
 def switch_gems(gem1_pos, gem2_pos):
     global list_of_gems
+    switch_sound.play()
     gem1_row = gem1_pos[0]
     gem1_col = gem1_pos[1]
     gem2_row = gem2_pos[0]
